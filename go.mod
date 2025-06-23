@@ -1,4 +1,4 @@
-module github.com/axellelanca/urlshortener
+module github.com/Edofo/bitly-clone
 
 go 1.24.3
 

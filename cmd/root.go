@@ -5,8 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/axellelanca/urlshortener/internal/config"
-	"github.com/spf13/cobra"
+	"github.com/Edofo/bitly-clone/internal/config"
 )
 
 // cfg est la variable globale qui contiendra la configuration chargée.

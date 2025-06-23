@@ -3,15 +3,11 @@ package cli
 import (
 	"fmt"
 	"log"
-	"net/url" // Pour valider le format de l'URL
-	"os"
 
-	cmd2 "github.com/axellelanca/urlshortener/cmd"
-	"github.com/axellelanca/urlshortener/internal/repository"
-	"github.com/axellelanca/urlshortener/internal/services"
+	// Pour valider le format de l'URL
+
 	"github.com/spf13/cobra"
-	"gorm.io/driver/sqlite" // Driver SQLite pour GORM
-	"gorm.io/gorm"
+	// Driver SQLite pour GORM
 )
 
 // TODO : Faire une variable longURLFlag qui stockera la valeur du flag --url

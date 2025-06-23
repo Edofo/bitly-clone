@@ -6,8 +6,8 @@ import (
 	"sync" // Pour protéger l'accès concurrentiel à knownStates
 	"time"
 
-	_ "github.com/axellelanca/urlshortener/internal/models"   // Importe les modèles de liens
-	"github.com/axellelanca/urlshortener/internal/repository" // Importe le repository de liens
+	_ "github.com/Edofo/bitly-clone/internal/models"   // Importe les modèles de liens
+	"github.com/Edofo/bitly-clone/internal/repository" // Importe le repository de liens
 )
 
 // UrlMonitor gère la surveillance périodique des URLs longues.
