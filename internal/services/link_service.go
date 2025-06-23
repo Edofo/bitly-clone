@@ -20,6 +20,12 @@ type LinkService struct {
 	linkRepo repository.LinkRepository
 }
 
+type LinkServiceInterface interface {
+	CreateLink(longURL string) (*models.Link, error)
+	GetLinkByShortCode(shortCode string) (*models.Link, error)
+	GetLinkStats(shortCode string) (*models.Link, int, error)
+}
+
 func NewLinkService(linkRepo repository.LinkRepository) *LinkService {
 	return &LinkService{
 		linkRepo: linkRepo,
