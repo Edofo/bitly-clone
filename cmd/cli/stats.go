@@ -10,14 +10,12 @@ import (
 	"github.com/Edofo/bitly-clone/internal/services"
 	"github.com/spf13/cobra"
 
-	"gorm.io/driver/sqlite" // Driver SQLite pour GORM
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-// shortCodeFlag stockera la valeur du flag --code
 var shortCodeFlag string
 
-// StatsCmd représente la commande 'stats'
 var StatsCmd = &cobra.Command{
 	Use:   "stats",
 	Short: "Affiche les statistiques (nombre de clics) pour un lien court.",
@@ -27,20 +25,17 @@ pour une URL courte spécifique en utilisant son code.
 Exemple:
   url-shortener stats --code="xyz123"`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Valider que le flag --code a été fourni
 		if shortCodeFlag == "" {
 			fmt.Println("Erreur: Le flag --code est requis.")
 			os.Exit(1)
 		}
 
-		// Charger la configuration chargée globalement via cmd.Cfg
 		cfg := cmd2.Cfg
 		if cfg == nil {
 			fmt.Println("Erreur: Configuration non chargée.")
 			os.Exit(1)
 		}
 
-		// Initialiser la connexion à la base de données SQLite avec GORM
 		db, err := gorm.Open(sqlite.Open(cfg.Database.Name), &gorm.Config{})
 		if err != nil {
 			log.Fatalf("FATAL: Impossible de se connecter à la base de données: %v", err)
@@ -51,14 +46,11 @@ Exemple:
 			log.Fatalf("FATAL: Échec de l'obtention de la base de données SQL sous-jacente: %v", err)
 		}
 
-		// S'assurer que la connexion est fermée à la fin de l'exécution de la commande
 		defer sqlDB.Close()
 
-		// Initialiser les repositories et services nécessaires
 		linkRepo := repository.NewLinkRepository(db)
 		linkService := services.NewLinkService(linkRepo)
 
-		// Appeler GetLinkStats pour récupérer le lien et ses statistiques
 		link, totalClicks, err := linkService.GetLinkStats(shortCodeFlag)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
@@ -75,15 +67,10 @@ Exemple:
 	},
 }
 
-// init() s'exécute automatiquement lors de l'importation du package.
-// Il est utilisé pour définir les flags que cette commande accepte.
 func init() {
-	// Définir le flag --code pour la commande stats
 	StatsCmd.Flags().StringVar(&shortCodeFlag, "code", "", "Code court pour lequel afficher les statistiques")
 
-	// Marquer le flag comme requis
 	StatsCmd.MarkFlagRequired("code")
 
-	// Ajouter la commande à RootCmd
 	cmd2.RootCmd.AddCommand(StatsCmd)
 }

@@ -183,8 +183,9 @@ func TestCreateShortLinkHandler_ServiceError(t *testing.T) {
 func TestRedirectHandler_Success(t *testing.T) {
 	router := setupTestRouter()
 	mockService := &MockLinkService{}
+	clickEventsChan := make(chan models.ClickEvent, 1)
 	
-	router.GET("/:shortCode", RedirectHandler(mockService))
+	router.GET("/:shortCode", RedirectHandler(mockService, clickEventsChan))
 	
 	expectedLink := &models.Link{
 		ID:        1,
@@ -209,8 +210,9 @@ func TestRedirectHandler_Success(t *testing.T) {
 func TestRedirectHandler_LinkNotFound(t *testing.T) {
 	router := setupTestRouter()
 	mockService := &MockLinkService{}
+	clickEventsChan := make(chan models.ClickEvent, 1)
 	
-	router.GET("/:shortCode", RedirectHandler(mockService))
+	router.GET("/:shortCode", RedirectHandler(mockService, clickEventsChan))
 	
 	mockService.On("GetLinkByShortCode", "nonexistent").Return(nil, gorm.ErrRecordNotFound)
 	
@@ -232,8 +234,9 @@ func TestRedirectHandler_LinkNotFound(t *testing.T) {
 func TestRedirectHandler_ServiceError(t *testing.T) {
 	router := setupTestRouter()
 	mockService := &MockLinkService{}
+	clickEventsChan := make(chan models.ClickEvent, 1)
 	
-	router.GET("/:shortCode", RedirectHandler(mockService))
+	router.GET("/:shortCode", RedirectHandler(mockService, clickEventsChan))
 	
 	mockService.On("GetLinkByShortCode", "error").Return(nil, assert.AnError)
 	
@@ -338,13 +341,12 @@ func TestGetLinkStatsHandler_ServiceError(t *testing.T) {
 }
 
 func TestRedirectHandler_ClickEventChannel(t *testing.T) {
-	ClickEventsChannel = make(chan models.ClickEvent, 1)
-	defer close(ClickEventsChannel)
+	clickEventsChan := make(chan models.ClickEvent, 1)
 	
 	router := setupTestRouter()
 	mockService := &MockLinkService{}
 	
-	router.GET("/:shortCode", RedirectHandler(mockService))
+	router.GET("/:shortCode", RedirectHandler(mockService, clickEventsChan))
 	
 	expectedLink := &models.Link{
 		ID:        1,
@@ -362,7 +364,7 @@ func TestRedirectHandler_ClickEventChannel(t *testing.T) {
 	go router.ServeHTTP(w, req)
 	
 	select {
-	case clickEvent := <-ClickEventsChannel:
+	case clickEvent := <-clickEventsChan:
 		assert.Equal(t, uint(1), clickEvent.LinkID)
 		assert.Equal(t, "TestAgent", clickEvent.UserAgent)
 		assert.Equal(t, "192.168.1.1", clickEvent.IPAddress)
