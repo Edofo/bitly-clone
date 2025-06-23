@@ -90,7 +90,7 @@ func RedirectHandler(linkService *services.LinkService) gin.HandlerFunc {
 
 		select {
 		case ClickEventsChannel <- clickEvent:
-			// Event sent successfully
+			log.Printf("Click event for %s sent to channel", shortCode)
 		default:
 			log.Printf("Warning: ClickEventsChannel is full, dropping click event for %s.", shortCode)
 		}
