@@ -42,7 +42,7 @@ func LoadConfig() (*Config, error) {
 		}
 	}
 
-	var cfg Config = Config{}
+	var cfg = Config{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("error unmarshalling config: %w", err)
 	}

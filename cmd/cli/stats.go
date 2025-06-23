@@ -46,7 +46,11 @@ Exemple:
 			log.Fatalf("FATAL: Échec de l'obtention de la base de données SQL sous-jacente: %v", err)
 		}
 
-		defer sqlDB.Close()
+		defer func() {
+			if err := sqlDB.Close(); err != nil {
+				log.Printf("Warning: Failed to close database connection: %v", err)
+			}
+		}()
 
 		linkRepo := repository.NewLinkRepository(db)
 		linkService := services.NewLinkService(linkRepo)
@@ -70,7 +74,9 @@ Exemple:
 func init() {
 	StatsCmd.Flags().StringVar(&shortCodeFlag, "code", "", "Code court pour lequel afficher les statistiques")
 
-	StatsCmd.MarkFlagRequired("code")
+	if err := StatsCmd.MarkFlagRequired("code"); err != nil {
+		log.Fatalf("Failed to mark code flag as required: %v", err)
+	}
 
 	cmd2.RootCmd.AddCommand(StatsCmd)
 }

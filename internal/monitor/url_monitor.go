@@ -79,7 +79,11 @@ func (m *UrlMonitor) isUrlAccessible(url string) bool {
 		return false
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("[MONITOR] Warning: Failed to close response body: %v", err)
+		}
+	}()
 
 	return resp.StatusCode >= 200 && resp.StatusCode < 400
 }

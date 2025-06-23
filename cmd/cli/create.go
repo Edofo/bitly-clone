@@ -51,7 +51,11 @@ Exemple:
 			log.Fatalf("FATAL: Échec de l'obtention de la base de données SQL sous-jacente: %v", err)
 		}
 
-		defer sqlDB.Close()
+		defer func() {
+			if err := sqlDB.Close(); err != nil {
+				log.Printf("Warning: Failed to close database connection: %v", err)
+			}
+		}()
 
 		linkRepo := repository.NewLinkRepository(db)
 		linkService := services.NewLinkService(linkRepo)
@@ -72,7 +76,9 @@ Exemple:
 func init() {
 	CreateCmd.Flags().StringVar(&longURLFlag, "url", "", "URL longue à raccourcir")
 
-	CreateCmd.MarkFlagRequired("url")
+	if err := CreateCmd.MarkFlagRequired("url"); err != nil {
+		log.Fatalf("Failed to mark url flag as required: %v", err)
+	}
 
 	cmd2.RootCmd.AddCommand(CreateCmd)
 }
