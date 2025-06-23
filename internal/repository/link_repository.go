@@ -1,9 +1,7 @@
 package repository
 
 import (
-	"fmt"
-
-	"github.com/axellelanca/urlshortener/internal/models"
+	"github.com/Edofo/bitly-clone/internal/models"
 	"gorm.io/gorm"
 )
 

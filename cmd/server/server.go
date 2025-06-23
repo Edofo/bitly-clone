@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,17 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	cmd2 "github.com/axellelanca/urlshortener/cmd"
-	"github.com/axellelanca/urlshortener/internal/api"
-	"github.com/axellelanca/urlshortener/internal/models"
-	"github.com/axellelanca/urlshortener/internal/monitor"
-	"github.com/axellelanca/urlshortener/internal/repository"
-	"github.com/axellelanca/urlshortener/internal/services"
-	"github.com/axellelanca/urlshortener/internal/workers"
-	"github.com/gin-gonic/gin"
+	"github.com/Edofo/bitly-clone/internal/monitor"
 	"github.com/spf13/cobra"
-	"gorm.io/driver/sqlite" // Driver SQLite pour GORM
-	"gorm.io/gorm"
+	// Driver SQLite pour GORM
 )
 
 // RunServerCmd représente la commande 'run-server' de Cobra.
