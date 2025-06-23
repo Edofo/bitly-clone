@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Edofo/bitly-clone/cmd"
+	"github.com/Edofo/bitly-clone/internal/config"
 	"github.com/Edofo/bitly-clone/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -74,6 +76,13 @@ func TestHealthCheckHandler(t *testing.T) {
 }
 
 func TestCreateShortLinkHandler_Success(t *testing.T) {
+	cmd.Cfg = &config.Config{}
+	cmd.Cfg.Server.Port = 8080
+	cmd.Cfg.Server.BaseURL = "http://localhost:8080"
+	cmd.Cfg.Database.Name = "url_shortener.db"
+	cmd.Cfg.Analytics.BufferSize = 1000
+	cmd.Cfg.Analytics.Workers = 5
+	cmd.Cfg.Monitor.IntervalMinutes = 5
 	router := setupTestRouter()
 	mockService := &MockLinkService{}
 	
