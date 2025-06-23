@@ -61,7 +61,7 @@ func CreateShortLinkHandler(linkService *services.LinkService) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, gin.H{
 			"short_code":     link.ShortCode,
 			"long_url":       link.LongURL,
-			"full_short_url": "http://localhost:8080/" + link.ShortCode,
+			"full_short_url": cmd.Cfg.Server.BaseURL + "/" + link.ShortCode,
 		})
 	}
 }
