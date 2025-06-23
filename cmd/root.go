@@ -24,7 +24,10 @@ var RootCmd = &cobra.Command{
 	
 	Utilisez 'url-shortener [command] --help' pour plus d'informations sur une commande.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		if err := cmd.Help(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error displaying help: %v\n", err)
+			os.Exit(1)
+		}
 	},
 }
 

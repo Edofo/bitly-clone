@@ -34,7 +34,11 @@ basées sur les modèles Go.`,
 			log.Fatalf("FATAL: Échec de l'obtention de la base de données SQL sous-jacente: %v", err)
 		}
 
-		defer sqlDB.Close()
+		defer func() {
+			if err := sqlDB.Close(); err != nil {
+				log.Printf("Warning: Failed to close database connection: %v", err)
+			}
+		}()
 
 		err = db.AutoMigrate(&models.Link{}, &models.Click{})
 		if err != nil {

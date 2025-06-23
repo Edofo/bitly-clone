@@ -43,7 +43,11 @@ puis lance le serveur HTTP.`,
 		if err != nil {
 			log.Fatalf("FATAL: Failed to get underlying SQL database: %v", err)
 		}
-		defer sqlDB.Close()
+		defer func() {
+			if err := sqlDB.Close(); err != nil {
+				log.Printf("Warning: Failed to close database connection: %v", err)
+			}
+		}()
 
 		linkRepo := repository.NewLinkRepository(db)
 		clickRepo := repository.NewClickRepository(db)

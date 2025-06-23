@@ -56,9 +56,6 @@ func setupTestRouter() *gin.Engine {
 	return router
 }
 
-func setupTestConfig() {
-}
-
 func TestHealthCheckHandler(t *testing.T) {
 	router := setupTestRouter()
 	router.GET("/health", HealthCheckHandler)
