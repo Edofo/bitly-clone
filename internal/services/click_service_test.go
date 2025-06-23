@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockClickRepository est un mock du ClickRepository pour les tests
 type MockClickRepository struct {
 	mock.Mock
 }

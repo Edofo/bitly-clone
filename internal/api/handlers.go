@@ -13,17 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var ClickEventsChannel chan models.ClickEvent
-
-func SetupRoutes(router *gin.Engine, linkService services.LinkServiceInterface) {
-	if ClickEventsChannel == nil {
-		bufferSize := 1000 
-		if cmd.Cfg != nil {
-			bufferSize = cmd.Cfg.Analytics.BufferSize
-		}
-		ClickEventsChannel = make(chan models.ClickEvent, bufferSize) 
-	}
-
+func SetupRoutes(router *gin.Engine, linkService services.LinkServiceInterface, clickEventsChan chan<- models.ClickEvent) {
 	router.GET("/health", HealthCheckHandler)
 
 	api := router.Group("/api/v1")
@@ -32,7 +22,7 @@ func SetupRoutes(router *gin.Engine, linkService services.LinkServiceInterface) 
 		api.GET("/links/:shortCode/stats", GetLinkStatsHandler(linkService))
 	}
 
-	router.GET("/:shortCode", RedirectHandler(linkService))
+	router.GET("/:shortCode", RedirectHandler(linkService, clickEventsChan))
 }
 
 func HealthCheckHandler(c *gin.Context) {
@@ -66,7 +56,7 @@ func CreateShortLinkHandler(linkService services.LinkServiceInterface) gin.Handl
 	}
 }
 
-func RedirectHandler(linkService services.LinkServiceInterface) gin.HandlerFunc {
+func RedirectHandler(linkService services.LinkServiceInterface, clickEventsChan chan<- models.ClickEvent) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		shortCode := c.Param("shortCode")
 
@@ -89,7 +79,7 @@ func RedirectHandler(linkService services.LinkServiceInterface) gin.HandlerFunc 
 		}
 
 		select {
-		case ClickEventsChannel <- clickEvent:
+		case clickEventsChan <- clickEvent:
 			log.Printf("Click event for %s sent to channel", shortCode)
 		default:
 			log.Printf("Warning: ClickEventsChannel is full, dropping click event for %s.", shortCode)
