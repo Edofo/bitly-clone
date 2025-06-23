@@ -34,18 +34,18 @@ puis lance le serveur HTTP.`,
 		// Charger la configuration chargée globalement via cmd.Cfg
 		cfg := cmd2.Cfg
 		if cfg == nil {
-			log.Fatalf("FATAL: Configuration non chargée.")
+			log.Fatalf("FATAL: Configuration not loaded.")
 		}
 
 		// Initialiser la connexion à la base de données SQLite avec GORM
 		db, err := gorm.Open(sqlite.Open(cfg.Database.Name), &gorm.Config{})
 		if err != nil {
-			log.Fatalf("FATAL: Impossible de se connecter à la base de données: %v", err)
+			log.Fatalf("FATAL: Unable to connect to database: %v", err)
 		}
 
 		sqlDB, err := db.DB()
 		if err != nil {
-			log.Fatalf("FATAL: Échec de l'obtention de la base de données SQL sous-jacente: %v", err)
+			log.Fatalf("FATAL: Failed to get underlying SQL database: %v", err)
 		}
 		defer sqlDB.Close()
 
@@ -54,34 +54,34 @@ puis lance le serveur HTTP.`,
 		clickRepo := repository.NewClickRepository(db)
 
 		// Laissez le log
-		log.Println("Repositories initialisés.")
+		log.Println("Repositories initialized.")
 
 		// Initialiser les services métiers
 		linkService := services.NewLinkService(linkRepo)
 		_ = services.NewClickService(clickRepo) // Service créé mais pas utilisé directement dans server
 
 		// Laissez le log
-		log.Println("Services métiers initialisés.")
+		log.Println("Business services initialized.")
 
 		// Initialiser le channel des événements de clic et lancer les workers
 		clickEventsChan := make(chan models.ClickEvent, cfg.Analytics.BufferSize)
 		workers.StartClickWorkers(cfg.Analytics.Workers, clickEventsChan, clickRepo)
 
-		log.Printf("Channel d'événements de clic initialisé avec un buffer de %d. %d worker(s) de clics démarré(s).",
+		log.Printf("Click events channel initialized with buffer size %d. %d click worker(s) started.",
 			cfg.Analytics.BufferSize, cfg.Analytics.Workers)
 
 		// Initialiser et lancer le moniteur d'URLs
 		monitorInterval := time.Duration(cfg.Monitor.IntervalMinutes) * time.Minute
 		urlMonitor := monitor.NewUrlMonitor(linkRepo, monitorInterval)
 		go urlMonitor.Start()
-		log.Printf("Moniteur d'URLs démarré avec un intervalle de %v.", monitorInterval)
+		log.Printf("URL monitor started with interval %v.", monitorInterval)
 
 		// Configurer le routeur Gin et les handlers API
 		router := gin.Default()
 		api.SetupRoutes(router, linkService)
 
 		// Pas toucher au log
-		log.Println("Routes API configurées.")
+		log.Println("API routes configured.")
 
 		// Créer le serveur HTTP Gin
 		serverAddr := fmt.Sprintf(":%d", cfg.Server.Port)
@@ -92,9 +92,9 @@ puis lance le serveur HTTP.`,
 
 		// Démarrer le serveur Gin dans une goroutine anonyme pour ne pas bloquer
 		go func() {
-			log.Printf("Serveur démarré sur le port %d", cfg.Server.Port)
+			log.Printf("Server started on port %d", cfg.Server.Port)
 			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				log.Fatalf("FATAL: Échec du démarrage du serveur: %v", err)
+				log.Fatalf("FATAL: Failed to start server: %v", err)
 			}
 		}()
 
@@ -105,13 +105,13 @@ puis lance le serveur HTTP.`,
 
 		// Bloquer jusqu'à ce qu'un signal d'arrêt soit reçu.
 		<-quit
-		log.Println("Signal d'arrêt reçu. Arrêt du serveur...")
+		log.Println("Shutdown signal received. Stopping server...")
 
 		// Arrêt propre du serveur HTTP avec un timeout.
-		log.Println("Arrêt en cours... Donnez un peu de temps aux workers pour finir.")
+		log.Println("Shutting down... Giving workers time to finish.")
 		time.Sleep(5 * time.Second)
 
-		log.Println("Serveur arrêté proprement.")
+		log.Println("Server stopped gracefully.")
 	},
 }
 

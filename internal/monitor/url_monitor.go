@@ -31,7 +31,7 @@ func NewUrlMonitor(linkRepo repository.LinkRepository, interval time.Duration) *
 // Start lance la boucle de surveillance périodique des URLs.
 // Cette fonction est conçue pour être lancée dans une goroutine séparée.
 func (m *UrlMonitor) Start() {
-	log.Printf("[MONITOR] Démarrage du moniteur d'URLs avec un intervalle de %v...", m.interval)
+	log.Printf("[MONITOR] Starting URL monitor with interval %v...", m.interval)
 	ticker := time.NewTicker(m.interval) // Crée un ticker qui envoie un signal à chaque intervalle
 	defer ticker.Stop()                  // S'assure que le ticker est arrêté quand Start se termine
 
@@ -46,12 +46,12 @@ func (m *UrlMonitor) Start() {
 
 // checkUrls effectue une vérification de l'état de toutes les URLs longues enregistrées.
 func (m *UrlMonitor) checkUrls() {
-	log.Println("[MONITOR] Lancement de la vérification de l'état des URLs...")
+	log.Println("[MONITOR] Starting URL status check...")
 
 	// Récupérer toutes les URLs longues actives depuis le linkRepo
 	links, err := m.linkRepo.GetAllLinks()
 	if err != nil {
-		log.Printf("[MONITOR] ERREUR lors de la récupération des liens pour la surveillance : %v", err)
+		log.Printf("[MONITOR] ERROR retrieving links for monitoring: %v", err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (m *UrlMonitor) checkUrls() {
 
 		// Si c'est la première vérification pour ce lien, on initialise l'état sans notifier.
 		if !exists {
-			log.Printf("[MONITOR] État initial pour le lien %s (%s) : %s",
+			log.Printf("[MONITOR] Initial state for link %s (%s): %s",
 				link.ShortCode, link.LongURL, formatState(currentState))
 			continue
 		}
@@ -75,11 +75,11 @@ func (m *UrlMonitor) checkUrls() {
 		// Comparer l'état actuel avec l'état précédent
 		// Si l'état a changé, générer une fausse notification dans les logs
 		if previousState != currentState {
-			log.Printf("[NOTIFICATION] Le lien %s (%s) est passé de %s à %s !",
+			log.Printf("[NOTIFICATION] Link %s (%s) changed from %s to %s!",
 				link.ShortCode, link.LongURL, formatState(previousState), formatState(currentState))
 		}
 	}
-	log.Println("[MONITOR] Vérification de l'état des URLs terminée.")
+	log.Println("[MONITOR] URL status check completed.")
 }
 
 // isUrlAccessible effectue une requête HTTP HEAD pour vérifier l'accessibilité d'une URL.
@@ -92,7 +92,7 @@ func (m *UrlMonitor) isUrlAccessible(url string) bool {
 	// Effectuer une requête HEAD (plus légère que GET) sur l'URL
 	resp, err := client.Head(url)
 	if err != nil {
-		log.Printf("[MONITOR] Erreur d'accès à l'URL '%s': %v", url, err)
+		log.Printf("[MONITOR] Error accessing URL '%s': %v", url, err)
 		return false
 	}
 
