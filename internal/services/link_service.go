@@ -20,6 +20,12 @@ type LinkService struct {
 	linkRepo repository.LinkRepository
 }
 
+type LinkServiceInterface interface {
+	CreateLink(longURL string) (*models.Link, error)
+	GetLinkByShortCode(shortCode string) (*models.Link, error)
+	GetLinkStats(shortCode string) (*models.Link, int, error)
+}
+
 func NewLinkService(linkRepo repository.LinkRepository) *LinkService {
 	return &LinkService{
 		linkRepo: linkRepo,
@@ -27,6 +33,9 @@ func NewLinkService(linkRepo repository.LinkRepository) *LinkService {
 }
 
 func (s *LinkService) GenerateShortCode(length int) (string, error) {
+	if length <= 0 {
+		return "", errors.New("invalid short code length")
+	}
 	result := make([]byte, length)
 	for i := range result {
 		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))

@@ -15,7 +15,7 @@ import (
 
 var ClickEventsChannel chan models.ClickEvent
 
-func SetupRoutes(router *gin.Engine, linkService *services.LinkService) {
+func SetupRoutes(router *gin.Engine, linkService services.LinkServiceInterface) {
 	if ClickEventsChannel == nil {
 		bufferSize := 1000 
 		if cmd.Cfg != nil {
@@ -43,7 +43,7 @@ type CreateLinkRequest struct {
 	LongURL string `json:"long_url" binding:"required,url"`
 }
 
-func CreateShortLinkHandler(linkService *services.LinkService) gin.HandlerFunc {
+func CreateShortLinkHandler(linkService services.LinkServiceInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req CreateLinkRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -66,7 +66,7 @@ func CreateShortLinkHandler(linkService *services.LinkService) gin.HandlerFunc {
 	}
 }
 
-func RedirectHandler(linkService *services.LinkService) gin.HandlerFunc {
+func RedirectHandler(linkService services.LinkServiceInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		shortCode := c.Param("shortCode")
 
@@ -99,7 +99,7 @@ func RedirectHandler(linkService *services.LinkService) gin.HandlerFunc {
 	}
 }
 
-func GetLinkStatsHandler(linkService *services.LinkService) gin.HandlerFunc {
+func GetLinkStatsHandler(linkService services.LinkServiceInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		shortCode := c.Param("shortCode")
 

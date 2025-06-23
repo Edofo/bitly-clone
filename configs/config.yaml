@@ -11,7 +11,7 @@ database:
 analytics:
   buffer_size: 1000                        # Taille du buffer pour le channel des événements de clic.
   # Permet de gérer un pic de charge sans bloquer la redirection.
-  worker_count: 5                          # Nombre de goroutines dédiées à l'enregistrement des clics en base.
+  workers: 5                          # Nombre de goroutines dédiées à l'enregistrement des clics en base.
 
 # Configuration du moniteur d'URLs
 monitor:

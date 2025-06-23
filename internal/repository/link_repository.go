@@ -27,7 +27,10 @@ func (r *GormLinkRepository) CreateLink(link *models.Link) error {
 func (r *GormLinkRepository) GetLinkByShortCode(shortCode string) (*models.Link, error) {
 	var link models.Link
 	err := r.db.Where("short_code = ?", shortCode).First(&link).Error
-	return &link, err
+	if err != nil {
+		return nil, err
+	}
+	return &link, nil
 }
 
 func (r *GormLinkRepository) GetAllLinks() ([]models.Link, error) {
