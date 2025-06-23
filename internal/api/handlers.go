@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Edofo/bitly-clone/cmd"
 	"github.com/Edofo/bitly-clone/internal/models"
 	"github.com/Edofo/bitly-clone/internal/services"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,11 @@ var ClickEventsChannel chan models.ClickEvent
 
 func SetupRoutes(router *gin.Engine, linkService *services.LinkService) {
 	if ClickEventsChannel == nil {
-		ClickEventsChannel = make(chan models.ClickEvent, 1000) // Buffer configurable
+		bufferSize := 1000 
+		if cmd.Cfg != nil {
+			bufferSize = cmd.Cfg.Analytics.BufferSize
+		}
+		ClickEventsChannel = make(chan models.ClickEvent, bufferSize) 
 	}
 
 	router.GET("/health", HealthCheckHandler)
